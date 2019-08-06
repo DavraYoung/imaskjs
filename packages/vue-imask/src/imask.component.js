@@ -1,11 +1,10 @@
 import IMask from 'imask';
 
 
-export
-const IMaskComponent = {
+export const IMaskComponent = {
   name: 'imask-input',
 
-  render (createElement) {
+  render(createElement) {
     const props = {
       domProps: {
         value: this.maskRef ? this.maskRef.value : this.value
@@ -23,25 +22,25 @@ const IMaskComponent = {
     return createElement('input', props);
   },
 
-  mounted () {
+  mounted() {
     if (!this.$props.mask) return;
 
     this._initMask();
   },
 
-  destroyed () {
+  destroyed() {
     this._destroyMask();
   },
 
   computed: {
-    maskOptions () {
+    maskOptions() {
       return this._extractOptionsFromProps(this.$props);
     },
   },
 
   watch: {
     '$props': {
-      handler (props) {
+      handler(props) {
         const maskOptions = this.maskOptions;
         if (maskOptions.mask) {
           if (this.maskRef) {
@@ -68,7 +67,7 @@ const IMaskComponent = {
   },
 
   methods: {
-    _extractOptionsFromProps (props) {
+    _extractOptionsFromProps(props) {
       props = {...props};
 
       // keep only defined props
@@ -84,37 +83,37 @@ const IMaskComponent = {
       return props;
     },
 
-    _maskValue () {
+    _maskValue() {
       if (this.unmask === 'typed') return this.maskRef.typedValue;
       if (this.unmask) return this.maskRef.unmaskedValue;
       return this.maskRef.value;
     },
 
-    _updateValue () {
+    _updateValue() {
       const value = this.value == null ? '' : this.value;
       if (this.unmask === 'typed') this.maskRef.typedValue = value;
       else if (this.unmask) this.maskRef.unmaskedValue = value;
       else this.maskRef.value = value;
     },
 
-    _onAccept () {
+    _onAccept() {
       const val = this._maskValue();
-      this.$emit('input', val);
-      this.$emit('accept', val);
+      this.$emit('input', val, this.maskRef);
+      this.$emit('accept', val, this.maskRef);
     },
 
-    _onComplete () {
-      this.$emit('complete', this._maskValue());
+    _onComplete() {
+      this.$emit('complete', this._maskValue(), this.maskRef);
     },
 
-    _initMask (maskOptions=this.maskOptions) {
+    _initMask(maskOptions = this.maskOptions) {
       this.maskRef = new IMask(this.$el, maskOptions)
         .on('accept', this._onAccept.bind(this))
         .on('complete', this._onComplete.bind(this));
       this._updateValue();
     },
 
-    _destroyMask () {
+    _destroyMask() {
       if (this.maskRef) {
         this.maskRef.destroy();
         delete this.maskRef;
